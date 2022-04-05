@@ -1,7 +1,7 @@
 //setup
 const express = require("express");
 
-const db = reqiure("./db.js");
+const db = require("./db.js");
 
 const utils = require("./utils.js");
 
@@ -102,6 +102,49 @@ app.get("/accounts", forceAuthorization, (req, res) => {
       res.status.send(500).send(error);
     } else {
       res.send(users);
+    }
+  });
+});
+
+/* ------------------------- C A R S -----------------------------------  */
+
+//get list of all cars
+app.get("/cars", forceAuthorization, (req, res) => {
+  db.getAllCars((error, cars) => {
+    if (error) {
+      res.status(500).send(error);
+    } else {
+      res.send(cars);
+    }
+  });
+});
+
+//get car by ID
+app.get("/cars/:id", forceAuthorization, (req, res) => {
+  const id = parseInt(req.params.id);
+  db.getCarById(id, (error, car) => {
+    if (error) {
+      res.status(500).send(error);
+    } else {
+      res.send(car);
+    }
+  });
+});
+
+//POST a new car
+app.post("/cars", forceAuthorization, (req, res) => {
+  const newCar = {
+    make: req.body.make,
+    model: req.body.model,
+  };
+
+  //this takes THREE arguments, make, model and callback! See in db.js
+  db.registerCar(newCar.make, newCar.model, (error) => {
+    if (error) {
+      console.log(error);
+      res.status(500).send(error);
+    } else {
+      res.sendStatus(200);
     }
   });
 });
