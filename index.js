@@ -71,6 +71,41 @@ app.post("/register", (req, res) => {
   ); //callback ends here
 });
 
+//LOGIN user
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+
+  db.getAccountByUsername(username, (error, account) => {
+    if (error) {
+      res.status(500).send(error);
+    } else if (account) {
+      const hashedPassword = account.hashedPassword;
+      const correctPassword = utils.comparePassword(password, hashedPassword);
+
+      if (correctPassword) {
+        const jwtToken = utils.getJWTToken(account);
+        res.send(jwtToken);
+      } else {
+        res.sendStatus(404);
+      }
+    } else {
+      res.sendStatus(404);
+    }
+  });
+});
+
+//only users that are logged on can see accounts
+app.get("/accounts", forceAuthorization, (req, res) => {
+  // db functions takes 2 arguments, first is the potential error and the 2nd is what we want to get
+  db.getAllAccounts((error, users) => {
+    if (error) {
+      res.status.send(500).send(error);
+    } else {
+      res.send(users);
+    }
+  });
+});
+
 app.listen(8000, () => {
   "http://localhost:8000/";
 });
