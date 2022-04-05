@@ -21,3 +21,23 @@ module.exports.comparePassword = (password, hash) => {
 
   return correct;
 };
+//using hashSync & compareSync because its easier for now (instead of asyncronous)
+
+//create and sign json webtoken ------------ jwt = string with loads of symbols.
+// this is readable, so dont place any sensitive info in this function
+module.exports.getJWTToken = (account) => {
+  const userData = { userId: account.id, username: account.username };
+  const accessToken = jwt.sign(userData, JWT_SECRET);
+
+  return accessToken; // send back to the user to they can prove that they are they
+};
+
+//verify signature of json webtoken
+module.exports.verifyJWT = (token) => {
+  return jwt.verify(token, JWT_SECRET);
+}; //is the token signed by us?
+
+//GET data from json web token
+module.exports.decodeJWT = (token) => {
+  return jwt.decode(token, JWT_SECRET);
+};
