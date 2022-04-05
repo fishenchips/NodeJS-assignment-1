@@ -41,6 +41,36 @@ const forceAuthorization = (req, res, next) => {
   }
 };
 
+//GET the start page
+app.get("/", (req, res) => {
+  res.send(req.user); //either loged in or not
+});
+
+/*  ------------------- USERS -------------------------------*/
+//CREATE new user
+app.post("/register", (req, res) => {
+  const { username, password, name, motto } = req.body;
+
+  //take hashed password from hashPassword function
+  const hashedPassword = utils.hashPassword(password);
+
+  db.registerUser(
+    username,
+    hashedPassword,
+    name,
+    motto,
+    /*       callback starts here!*/
+    (error) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send(error);
+      } else {
+        res.sendStatus(200);
+      }
+    }
+  ); //callback ends here
+});
+
 app.listen(8000, () => {
   "http://localhost:8000/";
 });
